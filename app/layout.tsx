@@ -1,11 +1,5 @@
 import "./globals.css";
-import { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
-
-export const metadata: Metadata = {
-  title: "smollm2-chatbot",
-  description: "An AI chatbot built using HuggingFaceTB/SmolLM2-1.7B-Instruct",
-};
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

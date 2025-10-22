@@ -1,57 +1,59 @@
-"use client";
-
-import {
-  pipeline,
-  TextGenerationPipelineType,
-} from "@huggingface/transformers";
-import { useEffect, useRef } from "react";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import { ArrowUp, Moon, Plus, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Github } from "@/components/icons/github";
-import { useTheme } from "next-themes";
+import { Chatbot } from "@/components/chatbot";
+import { Metadata } from "next";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ChevronsUpDown, Github } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+export const metadata: Metadata = {
+  title: "ChatSLM2",
+  description: "A chatbot built using HuggingFaceTB's SmolLM2 collection",
+};
 
 export default function Home() {
-  const { setTheme, theme } = useTheme();
-
-  const generator = useRef<TextGenerationPipelineType | null>(null);
-
-  useEffect(() => {
-    (async (): Promise<void> => {
-      generator.current = (await pipeline(
-        "text-generation",
-        "HuggingFaceTB/SmolLM2-1.7B-Instruct",
-      )) as unknown as TextGenerationPipelineType;
-    })();
-  }, []);
-
   return (
-    <>
+    <div>
       <header className="w-full p-4 backdrop-blur-md">
         <div className="flex justify-between">
-          <Button asChild variant="ghost">
-            <Link href="/">
-              <span className="text-lg font-extralight">smollm2-chatbot</span>
-            </Link>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="group">
+                <span className="text-lg font-extralight">ChatSLM</span>
+                <ChevronsUpDown className="text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" side="bottom">
+              <DropdownMenuItem>
+                <div className="grid">
+                  <span className="font-medium">SmolLM2-135M-Instruct</span>
+                  <span className="text-muted-foreground text-xs">Fastest</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <div className="grid">
+                  <span className="font-medium">SmolLM2-360M-Instruct</span>
+                  <span className="text-muted-foreground text-xs">
+                    Balanced
+                  </span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <div className="grid">
+                  <span className="font-medium">SmolLM2-1.7B-Instruct</span>
+                  <span className="text-muted-foreground text-xs">
+                    Smartest
+                  </span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <div className="flex">
-            <Button
-              onClick={() => {
-                setTheme(theme === "light" ? "dark" : "light");
-              }}
-              size="icon"
-              variant="ghost"
-              className="rounded-full"
-            >
-              <Sun className="scale-100 rotate-0 !transition-transform dark:scale-0 dark:rotate-90" />
-              <Moon className="absolute scale-0 rotate-90 !transition-transform dark:scale-100 dark:rotate-0" />
-            </Button>
+            <ThemeToggle />
             <Button
               asChild
               size="icon"
@@ -68,26 +70,7 @@ export default function Home() {
           </div>
         </div>
       </header>
-      <main>
-        main text area
-        <InputGroup className="rounded-full">
-          <InputGroupAddon align="inline-start">
-            <InputGroupButton size="icon-xs" className="rounded-full">
-              <Plus />
-            </InputGroupButton>
-          </InputGroupAddon>
-          <InputGroupInput placeholder="Ask anything" />
-          <InputGroupAddon align="inline-end">
-            <InputGroupButton
-              size="icon-xs"
-              variant="default"
-              className="rounded-full"
-            >
-              <ArrowUp />
-            </InputGroupButton>
-          </InputGroupAddon>
-        </InputGroup>
-      </main>
+      <Chatbot />
       <footer className="w-full">
         <p className="text-muted-foreground text-center text-xs">
           Built with{" "}
@@ -100,6 +83,6 @@ export default function Home() {
           .
         </p>
       </footer>
-    </>
+    </div>
   );
 }

@@ -1,14 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Chatbot } from "@/components/chatbot";
-import { Metadata } from "next";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Github } from "lucide-react";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "ChatSLM",
-  description: "An AI chatbot built using SmolLM2",
-};
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
   return (
@@ -38,9 +32,7 @@ export default function Home() {
           </div>
         </div>
       </header>
-      <div className="flex-1">
-        <Chatbot />
-      </div>
+      <Chatbot />
       <footer className="w-full p-2">
         <p className="text-muted-foreground text-center text-xs">
           ChatSLM can make mistakes. Check important info.

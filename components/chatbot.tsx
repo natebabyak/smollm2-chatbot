@@ -11,15 +11,9 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { ArrowUp, ChevronDown } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ModelMenu } from "./model-menu";
 
 interface Message {
   role: "system" | "user";
@@ -27,8 +21,6 @@ interface Message {
 }
 
 export function Chatbot() {
-  const [model, setModel] = useState<"135M" | "360M" | "1.7B">("135M");
-
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "system",
@@ -82,29 +74,27 @@ export function Chatbot() {
   };
 
   return (
-    <main className="flex h-full flex-1 flex-col">
-      <ScrollArea className="h-full flex-1 rounded-md border">
-        <ul className="flex flex-col gap-2 p-4">
-          {messages.slice(1).map((m, i) => (
-            <li
-              key={i}
+    <>
+      <ul className="flex flex-1 flex-col gap-2 overflow-y-auto p-4">
+        {messages.slice(1).map((m, i) => (
+          <li
+            key={i}
+            className={cn(
+              "flex",
+              m.role === "system" ? "justify-start" : "justify-end",
+            )}
+          >
+            <p
               className={cn(
-                "flex",
-                m.role === "system" ? "justify-start" : "justify-end",
+                "max-w-3/4 px-4 py-2",
+                m.role === "user" && "bg-accent rounded-2xl",
               )}
             >
-              <p
-                className={cn(
-                  "max-w-3/4 px-4 py-2",
-                  m.role === "user" && "bg-accent rounded-2xl",
-                )}
-              >
-                {m.content}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </ScrollArea>
+              {m.content}
+            </p>
+          </li>
+        ))}
+      </ul>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -114,44 +104,7 @@ export function Chatbot() {
       >
         <InputGroup className="rounded-full">
           <InputGroupAddon align="inline-start">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <InputGroupButton
-                  size="xs"
-                  variant="outline"
-                  className="rounded-full"
-                >
-                  <span>{model}</span>
-                  <ChevronDown />
-                </InputGroupButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" side="top">
-                <DropdownMenuItem>
-                  <div className="grid">
-                    <span className="font-medium">SmolLM2-135M-Instruct</span>
-                    <span className="text-muted-foreground text-xs">
-                      Fastest
-                    </span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <div className="grid">
-                    <span className="font-medium">SmolLM2-360M-Instruct</span>
-                    <span className="text-muted-foreground text-xs">
-                      Balanced
-                    </span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <div className="grid">
-                    <span className="font-medium">SmolLM2-1.7B-Instruct</span>
-                    <span className="text-muted-foreground text-xs">
-                      Smartest
-                    </span>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <ModelMenu />
           </InputGroupAddon>
           <InputGroupInput
             onChange={(e) => setInput(e.target.value)}
@@ -170,6 +123,6 @@ export function Chatbot() {
           </InputGroupAddon>
         </InputGroup>
       </form>
-    </main>
+    </>
   );
 }

@@ -14,6 +14,7 @@ import {
 import { ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ModelMenu } from "./model-menu";
+import { Spinner } from "./ui/spinner";
 
 interface Message {
   role: "system" | "user";
@@ -37,7 +38,7 @@ export function Chatbot() {
     (async (): Promise<void> => {
       generator.current = (await pipeline(
         "text-generation",
-        "HuggingFaceTB/SmolLM2-135M-Instruct",
+        "HuggingFaceTB/SmolLM2-360M-Instruct",
       )) as unknown as TextGenerationPipelineType;
     })();
   }, []);
@@ -50,7 +51,7 @@ export function Chatbot() {
       role: "user",
       content: input,
     };
-
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
 
     const output = await generator.current([...messages, userMessage], {
@@ -68,7 +69,7 @@ export function Chatbot() {
         "Something went wrong. Please try again later.",
     };
 
-    setMessages((prev) => [...prev, userMessage, systemMessage]);
+    setMessages((prev) => [...prev, systemMessage]);
 
     setLoading(false);
   };
@@ -115,10 +116,13 @@ export function Chatbot() {
             <InputGroupButton
               size="icon-xs"
               type="submit"
-              variant="default"
+              variant={loading ? "secondary" : "default"}
               className="rounded-full"
             >
-              <ArrowUp />
+              <ArrowUp className={cn("scale-100", loading && "scale-0")} />
+              <Spinner
+                className={cn("absolute scale-0", loading && "scale-100")}
+              />
             </InputGroupButton>
           </InputGroupAddon>
         </InputGroup>

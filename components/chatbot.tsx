@@ -10,27 +10,21 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { ArrowUp, Bot, ChevronDown } from "lucide-react";
+import { ArrowUp, Plus, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
 import TextareaAutosize from "react-textarea-autosize";
 import { CopyButton } from "./copy-button";
 import Markdown from "react-markdown";
+import { ModelMenu } from "./model-menu";
 
 interface Message {
   role: "system" | "user";
   content: string;
 }
 
-const models = ["135M", "360M", "1.7B"] as const;
-type Model = (typeof models)[number];
+export const models = ["135M", "360M", "1.7B"] as const;
+export type Model = (typeof models)[number];
 
 export function Chatbot() {
   const [input, setInput] = useState("");
@@ -42,8 +36,6 @@ export function Chatbot() {
     },
   ]);
   const [model, setModel] = useState<Model>("360M");
-  const [multi, setMulti] = useState(false);
-  const [open, setOpen] = useState(false);
 
   const generator = useRef<TextGenerationPipelineType | null>(null);
 
@@ -56,35 +48,59 @@ export function Chatbot() {
     })();
   }, [model]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!generator.current || !input.trim()) return;
-    setLoading(true);
 
     const userMessage: Message = {
       role: "user",
       content: input,
     };
+
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
 
-    const output = await generator.current([...messages, userMessage], {
+    generateResponse([...messages, userMessage]);
+  };
+
+  const generateResponse = async (currentMessages: Message[]) => {
+    if (!generator.current) return;
+
+    setLoading(true);
+
+    const output = await generator.current(currentMessages, {
       max_new_tokens: 128,
     });
 
-    const systemMessage: Message = {
-      role: "system",
-      content:
-        (
-          output as {
-            generated_text: Message[];
-          }[]
-        )[0].generated_text.at(-1)?.content ??
-        "Something went wrong. Please try again later.",
-    };
+    const fullContent =
+      (
+        output as {
+          generated_text: Message[];
+        }[]
+      )[0].generated_text.at(-1)?.content ??
+      "Something went wrong. Please try again later.";
 
-    setMessages((prev) => [...prev, systemMessage]);
+    setMessages((prev) => [...prev, { role: "system", content: "" }]);
+    const systemMessageIndex = currentMessages.length;
 
-    setLoading(false);
+    const words = fullContent.split(" ");
+    let index = 0;
+
+    const interval = setInterval(() => {
+      if (index <= words.length) {
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          newMessages[systemMessageIndex] = {
+            role: "system",
+            content: words.slice(0, index).join(" "),
+          };
+          return newMessages;
+        });
+        index++;
+      } else {
+        clearInterval(interval);
+        setLoading(false);
+      }
+    }, 50);
   };
 
   return (
@@ -113,59 +129,33 @@ export function Chatbot() {
         className="px-2 md:px-0"
       >
         <InputGroup className="mx-auto max-w-3xl rounded-3xl px-1">
-          <InputGroupAddon align={multi ? "block-start" : "inline-start"}>
-            <DropdownMenu onOpenChange={setOpen} open={open}>
-              <DropdownMenuTrigger asChild>
-                <InputGroupButton
-                  size="sm"
-                  variant="outline"
-                  className="rounded-full"
-                >
-                  <Bot />
-                  <span>{model}</span>
-                  <ChevronDown
-                    className={cn(
-                      "transition-transform",
-                      open && "-rotate-180",
-                    )}
-                  />
-                </InputGroupButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" side="top">
-                <DropdownMenuLabel>
-                  <span className="text-muted-foreground text-xs">Models</span>
-                </DropdownMenuLabel>
-                {models.map((m, i) => (
-                  <DropdownMenuItem
-                    disabled={m === "1.7B"}
-                    key={i}
-                    onClick={() => setModel(m)}
-                  >
-                    <div className="grid">
-                      <span className="font-medium">SmolLM2-{m}-Instruct</span>
-                      <span className="text-muted-foreground text-xs">
-                        {m === "135M"
-                          ? "Fastest"
-                          : m === "360M"
-                            ? "Balanced"
-                            : "Smartest"}
-                      </span>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </InputGroupAddon>
           <TextareaAutosize
             data-slot="input-group-control"
             onChange={(e) => setInput(e.target.value)}
-            onHeightChange={(height) => setMulti(height >= 32)}
             placeholder="Ask anything"
             value={input}
             className="flex field-sizing-content min-h-12 w-full resize-none bg-transparent px-3 py-2.5 transition-[color,box-shadow] outline-none"
           />
-          <InputGroupAddon align={multi ? "block-start" : "inline-end"}>
+          <InputGroupAddon align="block-end">
             <InputGroupButton
+              disabled
+              size="icon-sm"
+              variant="outline"
+              className="rounded-full"
+            >
+              <Plus />
+            </InputGroupButton>
+            <InputGroupButton
+              disabled
+              size="icon-sm"
+              variant="outline"
+              className="rounded-full"
+            >
+              <Settings2 />
+            </InputGroupButton>
+            <ModelMenu model={model} setModel={setModel} />
+            <InputGroupButton
+              disabled={loading}
               size="icon-sm"
               type="submit"
               variant={loading ? "secondary" : "default"}

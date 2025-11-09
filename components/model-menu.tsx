@@ -1,5 +1,16 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Bot, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -11,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { InputGroupButton } from "@/components/ui/input-group";
 import { useState } from "react";
-import { Model, models } from "@/components/chatbot";
+import { Model } from "@/components/chatbot";
 
 interface ModelMenuProps {
   model: string;
@@ -40,24 +51,48 @@ export function ModelMenu({ model, setModel }: ModelMenuProps) {
         <DropdownMenuLabel>
           <span className="text-muted-foreground text-xs">Models</span>
         </DropdownMenuLabel>
-        {models.map((m, i) => (
-          <DropdownMenuItem
-            disabled={m === "1.7B"}
-            key={i}
-            onClick={() => setModel(m)}
-          >
-            <div className="grid">
-              <span className="font-medium">SmolLM2-{m}-Instruct</span>
-              <span className="text-muted-foreground text-xs">
-                {m === "135M"
-                  ? "Fastest"
-                  : m === "360M"
-                    ? "Balanced"
-                    : "Smartest"}
-              </span>
-            </div>
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuItem onClick={() => setModel("135M")}>
+          <div className="grid">
+            <span className="font-medium">SmolLM2-135M-Instruct</span>
+            <span className="text-muted-foreground text-xs">Fastest</span>
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setModel("360M")}>
+          <div className="grid">
+            <span className="font-medium">SmolLM2-360M-Instruct</span>
+            <span className="text-muted-foreground text-xs">Balanced</span>
+          </div>
+        </DropdownMenuItem>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <div className="grid">
+                <span className="font-medium">SmolLM2-1.7B-Instruct</span>
+                <span className="text-muted-foreground text-xs">Smartest</span>
+              </div>
+            </DropdownMenuItem>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This model (SmolLM2-1.7B-Instruct) may not work as expected on
+                your device.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  setModel("1.7B");
+                  setOpen(false);
+                }}
+              >
+                Confirm
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DropdownMenuContent>
     </DropdownMenu>
   );

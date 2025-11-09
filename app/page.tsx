@@ -3,6 +3,7 @@ import { Chatbot } from "@/components/chatbot";
 import { Github } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
   return (
@@ -14,8 +15,7 @@ export default function Home() {
               <span className="text-lg font-extralight">ChatSLM</span>
             </Link>
           </Button>
-          <div className="flex">
-            <ThemeToggle />
+          <div className="flex items-center gap-2">
             <Button
               asChild
               size="icon"
@@ -29,6 +29,10 @@ export default function Home() {
                 <Github />
               </a>
             </Button>
+            <div className="h-4">
+              <Separator orientation="vertical" />
+            </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>

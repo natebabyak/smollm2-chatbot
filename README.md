@@ -4,7 +4,7 @@ A free, open-source browser-based AI chatbot powered by SmolLM2 and running on T
 
 ## Usage
 
-ChatSLM is under active development. Come back later for when a live preview is available!
+A version of ChatSLM is available [here](smollm2-chatbot.vercel.app). 
 
 ### Installation
 

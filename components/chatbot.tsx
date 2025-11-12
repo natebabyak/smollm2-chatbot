@@ -18,126 +18,6 @@ import { CopyButton } from "./copy-button";
 import Markdown from "react-markdown";
 import { ModelMenu } from "./model-menu";
 
-const systemMessage = `
-You are a helpful assistant named ChatSLM.
-
-You use Markdown to format your responses. The following is a cheat sheet for Markdown syntax.
-
-## Basic Syntax
-
-These are the elements outlined in John Gruber;s original design document. All Markdown applications support these elements.
-
-### Heading
-
-# H1
-## H2
-### H3
-
-### Bold
-
-**bold text**
-
-### Italic
-
-*italicized text*
-
-### Blockquote
-
-> blockquote
-
-### Ordered List
-
-1. First item
-2. Second item
-3. Third item
-
-### Unordered List
-
-- First item
-- Second item
-- Third item
-
-### Code
-
-\`code\`
-
-### Horizontal Rule
-
----
-
-### Link
-
-[Markdown Guide](https://www.markdownguide.org)
-
-### Image
-
-![alt text](https://www.markdownguide.org/assets/images/tux.png)
-
-## Extended Syntax
-
-These elements extend the basic syntax by adding additional features. Not all Markdown applications support these elements.
-
-### Table
-
-| Syntax | Description |
-| ----------- | ----------- |
-| Header | Title |
-| Paragraph | Text |
-
-### Fenced Code Block
-
-\`\`\`
-{
-  "firstName": "John",
-  "lastName": "Smith",
-  "age": 25
-}
-\`\`\`
-
-### Footnote
-
-Here's a sentence with a footnote. [^1]
-
-[^1]: This is the footnote.
-
-### Heading ID
-
-### My Great Heading {#custom-id}
-
-### Definition List
-
-term
-: definition
-
-### Strikethrough
-
-~~The world is flat.~~
-
-### Task List
-
-- [x] Write the press release
-- [ ] Update the website
-- [ ] Contact the media
-
-### Emoji
-
-That is so funny! :joy:
-
-(See also [Copying and Pasting Emoji](https://www.markdownguide.org/extended-syntax/#copying-and-pasting-emoji))
-
-### Highlight
-
-I need to highlight these ==very important words==.
-
-### Subscript
-
-H~2~O
-
-### Superscript
-
-X^2^
-`;
-
 interface Message {
   role: "system" | "user";
   content: string;
@@ -152,7 +32,7 @@ export function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "system",
-      content: systemMessage,
+      content: "You are a helpful assistant.",
     },
   ]);
   const [model, setModel] = useState<Model>("135M");
@@ -188,7 +68,7 @@ export function Chatbot() {
     setLoading(true);
 
     const output = await generator.current(currentMessages, {
-      max_new_tokens: 100000,
+      max_new_tokens: 128,
     });
 
     const fullContent =
@@ -224,7 +104,7 @@ export function Chatbot() {
   };
 
   return (
-    <>
+    <div className="flex h-full flex-col">
       <ul className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 overflow-y-auto p-4 px-2 md:px-0">
         {messages.slice(1).map((m, i) => (
           <li key={i} className="flex">
@@ -246,7 +126,7 @@ export function Chatbot() {
           e.preventDefault();
           handleSubmit();
         }}
-        className="px-2 md:px-0"
+        className="flex-none px-2 md:px-0"
       >
         <InputGroup className="mx-auto max-w-3xl rounded-3xl px-1">
           <TextareaAutosize
@@ -300,6 +180,6 @@ export function Chatbot() {
           </InputGroupAddon>
         </InputGroup>
       </form>
-    </>
+    </div>
   );
 }

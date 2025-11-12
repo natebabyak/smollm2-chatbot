@@ -7,9 +7,9 @@ import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-dvh flex-col overflow-hidden">
       <header className="p-4">
-        <div className="flex justify-between">
+        <div className="flex flex-none justify-between">
           <Button asChild variant="ghost" className="rounded-full">
             <Link href="/">
               <span className="text-lg font-extralight">ChatSLM</span>
@@ -36,8 +36,10 @@ export default function Home() {
           </div>
         </div>
       </header>
-      <Chatbot />
-      <footer className="w-full p-2">
+      <div className="flex-1 overflow-hidden">
+        <Chatbot />
+      </div>
+      <footer className="w-full flex-none p-2">
         <p className="text-muted-foreground text-center text-xs">
           ChatSLM can make mistakes. Check important info.
         </p>
